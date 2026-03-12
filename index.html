@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>文科生自救指南</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 开场黑屏 -->
+        <div id="opening-screen" class="screen active">
+            <div class="opening-content">
+                <div class="opening-text" id="opening-text"></div>
+            </div>
+            <div class="skip-hint">点击或按空格键跳过</div>
+        </div>
+
+        <!-- 开始界面 -->
+        <div id="start-screen" class="screen">
+            <div class="title-art">
+                <h1>文科生自救指南</h1>
+                <p class="subtitle">Liberal Arts Survival Guide</p>
+            </div>
+            <div class="tagline">"大学四年，自救还是沉沦"</div>
+            <div class="menu-options">
+                <button class="game-btn primary" onclick="game.startNewGame()">开始游戏</button>
+                <button class="game-btn" onclick="game.showIntro()">游戏说明</button>
+            </div>
+            <div class="version">v0.3</div>
+        </div>
+
+        <!-- 专业选择弹窗（模态框形式） -->
+        <div id="major-modal" class="modal hidden">
+            <div class="modal-content major-modal-content">
+                <h2>选择你的专业</h2>
+                <p class="hint">这个选择将影响你的大学四年...</p>
+                <div class="major-list">
+                    <div class="major-card" onclick="game.selectMajor('chinese')">
+                        <div class="major-name">汉语言文学</div>
+                        <div class="major-desc">"百无一用是书生，但你可以写得一手好文案"</div>
+                        <div class="major-bonus">写作++ | 表达++ | 就业率--</div>
+                    </div>
+                </div>
+                <div class="note">当前版本仅开放汉语言文学专业</div>
+            </div>
+        </div>
+
+        <!-- 游戏主界面 -->
+        <div id="main-screen" class="screen">
+            <!-- 顶部状态栏 -->
+            <div class="status-bar">
+                <div class="date-display">
+                    <span id="year">大一上学期 9月3日</span>
+                </div>
+                <div class="action-points">
+                    剩余行动: <span id="actions-left">10</span>
+                </div>
+            </div>
+
+            <!-- 核心属性区 -->
+            <div class="core-stats">
+                <div class="stat-card money-card">
+                    <span class="stat-label">生活费</span>
+                    <span class="stat-value" id="money">¥2000</span>
+                </div>
+                <div class="stat-card gpa-card">
+                    <span class="stat-label">绩点</span>
+                    <span class="stat-value" id="gpa-display">60</span>
+                </div>
+                <div class="stat-card anxiety-card">
+                    <span class="stat-label">焦虑</span>
+                    <div class="mini-bar">
+                        <div class="mini-fill anxiety-fill" id="anxiety-bar" style="width: 30%"></div>
+                    </div>
+                    <span class="stat-value" id="anxiety-value">30%</span>
+                </div>
+                <div class="stat-card idealism-card">
+                    <span class="stat-label">理想</span>
+                    <div class="mini-bar">
+                        <div class="mini-fill idealism-fill" id="idealism-bar" style="width: 80%"></div>
+                    </div>
+                    <span class="stat-value" id="idealism-value">80%</span>
+                </div>
+            </div>
+
+            <!-- 技能栏 -->
+            <div class="skills-section">
+                <div class="section-label">技能</div>
+                <div class="skills-bar" id="skills-display">
+                    <span class="empty-skill">暂无技能</span>
+                </div>
+            </div>
+
+            <!-- 人脉进度条 -->
+            <div class="network-section">
+                <div class="network-label">
+                    <span>人脉</span>
+                    <span id="network-level-name">素人</span>
+                </div>
+                <div class="network-bar">
+                    <div class="network-fill" id="network-bar" style="width: 25%"></div>
+                </div>
+                <div class="network-value" id="network-value">25/100</div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="main-content">
+                <!-- 叙事显示 -->
+                <div class="narrative-box" id="narrative">
+                    <div class="narrative-text" id="narrative-text">
+                        你站在大学校门口，手里拖着行李箱，望着来来往往的人群...
+                    </div>
+                </div>
+
+                <!-- 选择按钮区 -->
+                <div class="choices-box">
+                    <div class="choice-buttons" id="choice-buttons">
+                        <button class="choice-btn study-btn" onclick="game.makeChoice('study')">
+                            <span class="choice-text">认真学习</span>
+                            <span class="choice-hint">绩点↑ 焦虑↑</span>
+                        </button>
+                        <button class="choice-btn social-btn" onclick="game.makeChoice('social')">
+                            <span class="choice-text">自由行动</span>
+                            <span class="choice-hint">放松/钻研技能</span>
+                        </button>
+                        <button class="choice-btn work-btn" onclick="game.makeChoice('work')">
+                            <span class="choice-text">找份兼职</span>
+                            <span class="choice-hint">金钱↑</span>
+                        </button>
+                        <button class="choice-btn relax-btn" onclick="game.makeChoice('relax')">
+                            <span class="choice-text">躺平娱乐</span>
+                            <span class="choice-hint">焦虑↓</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部工具栏 -->
+            <div class="bottom-bar">
+                <button class="icon-btn" onclick="game.saveGame()" title="存档">💾</button>
+                <button class="icon-btn" onclick="game.toggleSkillsPanel()" title="技能">🎯</button>
+                <button class="icon-btn" onclick="game.toggleRelationsPanel()" title="关系">👥</button>
+            </div>
+        </div>
+
+        <!-- 新手引导遮罩 -->
+        <div id="tutorial-overlay" class="tutorial-overlay hidden">
+            <div class="tutorial-tooltip" id="tutorial-tooltip">
+                <div class="tutorial-content"></div>
+                <button class="game-btn" onclick="game.nextTutorial()">下一步</button>
+            </div>
+        </div>
+
+        <!-- 入学确认弹窗 -->
+        <div id="welcome-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>欢迎来到大学！</h3>
+                <p>你的四年旅程即将开始...</p>
+                <button class="game-btn primary" onclick="game.startTutorial()">入学</button>
+            </div>
+        </div>
+
+        <!-- 结局界面 -->
+        <div id="ending-screen" class="screen">
+            <div class="ending-title" id="ending-title">🎓 毕业结局</div>
+            <div class="ending-content" id="ending-content">
+                <!-- 结局内容动态生成 -->
+            </div>
+            <div class="ending-stats" id="ending-stats">
+                <!-- 最终统计 -->
+            </div>
+            <button class="game-btn primary" onclick="game.restart()">再来一局</button>
+        </div>
+
+        <!-- 游戏说明弹窗 -->
+        <div id="intro-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>游戏说明</h3>
+                <div class="intro-text">
+                    <p><strong>《文科生自救指南》</strong>是一款文字养成游戏。</p>
+                    <p>你将扮演一名文科大学生，通过四年的选择，走出属于自己的人生道路。</p>
+                    <br>
+                    <p><strong>核心玩法：</strong></p>
+                    <ul>
+                        <li>每周选择一个主要活动</li>
+                        <li>平衡焦虑、理想、金钱、技能等属性</li>
+                        <li>应对各种随机事件</li>
+                        <li>大四毕业时触发不同结局</li>
+                    </ul>
+                    <br>
+                    <p><strong>当前版本：</strong></p>
+                    <p>完整大学四年内容，汉语言文学专业。</p>
+                </div>
+                <button class="game-btn primary" onclick="game.closeIntro()">知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js?v=3"></script>
+    <script src="js/player.js?v=3"></script>
+    <script src="js/ui.js?v=3"></script>
+    <script src="js/game.js?v=3"></script>
+</body>
+</html>
